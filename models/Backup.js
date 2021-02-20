@@ -10,6 +10,7 @@ const BackupSchema = new mongoose.Schema({
   complete: Boolean,
   url: String,
   date: Date,
+  adhoc: Boolean,
   service: {
     type: ObjectId,
     ref: `Token`,
