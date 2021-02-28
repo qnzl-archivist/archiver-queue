@@ -1,0 +1,11 @@
+#!/bin/bash
+
+IP="45.76.2.252"
+KEY_NAME="qnzl_infra"
+PROJECT_NAME="archivist-queue"
+
+echo 'Syncing files to server'
+rsync --exclude=node_modules/ -rave "ssh -i ~/.ssh/${KEY_NAME} -A" * root@${IP}:${PROJECT_NAME};
+
+echo 'SSHing in and restarting the server'
+ssh root@${IP} -i ~/.ssh/${KEY_NAME} "cd ${PROJECT_NAME} && npm install"
