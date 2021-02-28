@@ -18,11 +18,13 @@ mongoose.connect(process.env.MONGO_URL, {
 
 const SERVICE_MAP = {
   twitter: `https://amos-twitter.vercel.app`,
-  youtube: `http://localhost:3000`,
+  todoist: `https://todoist.now.sh`,
+  trello: `https://trello-taupe-beta.now.sh`,
+  youtube: `https://amos-youtube.vercel.app`,
 }
 
-const BLOCK_STORAGE_PATH = `/home/maddie/test-archivist`
-//const BLOCK_STORAGE_PATH = `/mnt/blockstorage`
+//const BLOCK_STORAGE_PATH = `/home/maddie/test-archivist`
+const BLOCK_STORAGE_PATH = `/mnt/blockstorage`
 
 ;(async () => {
   try {
@@ -36,6 +38,7 @@ const BLOCK_STORAGE_PATH = `/home/maddie/test-archivist`
 
     debug(`got ${backups.length} backups`)
     const backupPromises = backups.map(async (backup) => {
+      console.log("BACKUP:", backup)
       if (!backup.service) {
         // Ignore + complete backups that have missing tokens.
         // This can happen due to unlinked services.
@@ -75,11 +78,11 @@ const BLOCK_STORAGE_PATH = `/home/maddie/test-archivist`
 
       const archivePath = `${BLOCK_STORAGE_PATH}/${uuid()}`
 
-      if (serviceName === `youtube`) {
+/*      if (serviceName === `youtube`) {
         const stringifiedResp = buffer.toString(`utf8`)
 
         const resp = JSON.parse(stringifiedResp)
-      }
+      }*/
 
       debug(`write to ${archivePath}`)
       await promisify(fs.writeFile)(archivePath, buffer)
@@ -93,12 +96,18 @@ const BLOCK_STORAGE_PATH = `/home/maddie/test-archivist`
         await Backup.create({
           user: userId,
           service: tokenId,
-          date: moment().add(1, `week`).toDate(),
+          date: moment().add(1, `month`).toDate(),
         })
       }
     })
 
-    const results = await Promise.allSettled(backupPromises)
+    const allSettled = backupPromises.map((backup) => {
+      return backup
+        .then((res) => Promise.resolve({ message: 'resolved', value: res }))
+        .catch((err) => Promise.resolve({ message: err, value: null }))
+    })
+
+    await Promise.all(allSettled)
 
     process.exit(0)
   } catch (e) {
