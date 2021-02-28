@@ -38,7 +38,6 @@ const BLOCK_STORAGE_PATH = `/mnt/blockstorage`
 
     debug(`got ${backups.length} backups`)
     const backupPromises = backups.map(async (backup) => {
-      console.log("BACKUP:", backup)
       if (!backup.service) {
         // Ignore + complete backups that have missing tokens.
         // This can happen due to unlinked services.
